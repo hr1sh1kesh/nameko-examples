@@ -17,6 +17,12 @@ while ! is_ready; do
     sleep 3
 done
 
+    while ! pg_isready -h postgresql; do echo "waiting for db"; sleep 5; done && \
+    PGPASSWORD=secretpassword PGUSER=postgres PGHOST=postgresql \
+    psql -tc "SELECT 1 FROM pg_database WHERE datname = 'orders'" | \
+    grep -q 1 || PGPASSWORD=secretpassword PGUSER=postgres PGHOST=postgresql \
+    psql -c "CREATE DATABASE orders" && \
+    alembic upgrade head && \
 # Run Migrations
 
 alembic upgrade head

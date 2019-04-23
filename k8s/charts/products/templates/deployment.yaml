@@ -17,11 +17,14 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       containers:
-      - image: nameko/nameko-example-products:{{ .Values.image.tag }}
+      - image: {{ .Values.image.org }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
         name: {{ .Chart.Name }}
+        imagePullPolicy: Always
         env:
+          - name: GRPC_BIND_PORT
+            value: "50051"
           - name: REDIS_HOST
-            value: cache-redis
+            value: redis-master
           - name: REDIS_INDEX
             value: "11"
           - name: REDIS_PORT
@@ -29,19 +32,19 @@ spec:
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: cache-redis
+                name: redis
                 key: redis-password
-          - name: RABBIT_HOST
-            value: broker-rabbitmq
+          - name: "RABBIT_HOST"
+            value: rabbitmq.example.service.svc.local
           - name: RABBIT_MANAGEMENT_PORT
             value: "15672"
-          - name: RABBIT_PORT
+          - name: "RABBIT_PORT"
             value: "5672"
-          - name: RABBIT_USER
-            value: user
+          - name: "RABBIT_USER"
+            value: admin
           - name: RABBIT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: broker-rabbitmq
+                name: rabbitmq
                 key: rabbitmq-password
       restartPolicy: Always

@@ -7,17 +7,19 @@ setup(
     description='Store and serve orders',
     packages=find_packages(exclude=['test', 'test.*']),
     install_requires=[
-        'nameko==2.8.5',
-        'nameko-sqlalchemy==0.0.4',
-        'alembic==0.8.7',
+        'nameko==2.11.0',
+        "nameko-grpc==1.0.1",
+        'nameko-sqlalchemy==1.4.0',
+        'alembic==1.0.7',
         'marshmallow==2.15.1',
-        'psycopg2==2.7.4',
+        "psycopg2-binary==2.7.7",
     ],
     extras_require={
         'dev': [
-            'pytest==3.1.1',
-            'coverage==4.4.1',
-            'flake8==3.3.0'
+            "pytest==4.3.0",
+            "coverage==4.5.2",
+            "flake8==3.7.6",
+            "grpcio-tools==1.18.0",
         ],
     },
     zip_safe=True

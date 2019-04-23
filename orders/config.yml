@@ -1,4 +1,22 @@
 DB_URIS:
-    "orders:Base": postgresql://${DB_USER:postgres}:${DB_PASSWORD:password}@${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:orders}
+    "orders:Base": postgresql://postgres:secretpassword@postgresql.examples.svc.cluster.local:5432/orders
 
-AMQP_URI: amqp://${RABBIT_USER:guest}:${RABBIT_PASSWORD:guest}@${RABBIT_HOST:localhost}:${RABBIT_PORT:5672}/
+AMQP_URI: amqp://admin:secretpassword@rabbitmq:5672
+
+GRPC_BIND_PORT: 50051
+
+LOGGING:
+    version: 1
+    disable_existing_loggers: False
+    formatters:
+        default:
+            format: "%(asctime)-15s [%(levelname)-4s] [orders] [%(name)-12s] %(message)s"
+    handlers:
+        default:
+            level: DEBUG
+            formatter: default
+            class: logging.StreamHandler
+    root:
+        level: DEBUG
+        propagate: True
+        handlers: [default]

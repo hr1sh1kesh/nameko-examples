@@ -29,6 +29,13 @@ class Order(DeclarativeBase):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "order_details": [
+                order_detail.to_dict() for order_detail in self.order_details
+            ],
+        }
 
 class OrderDetail(DeclarativeBase):
     __tablename__ = "order_details"
@@ -43,3 +50,13 @@ class OrderDetail(DeclarativeBase):
     product_id = Column(Integer, nullable=False)
     price = Column(DECIMAL(18, 2), nullable=False)
     quantity = Column(Integer, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "order_id": self.order_id,
+            "product_id": self.product_id,
+            "price": str(self.price),
+            "quantity": self.quantity,
+        }
+
