@@ -26,6 +26,16 @@ products-proto:
 	@sed -i.bak 's/^\(import.*_pb2\)/from . \1/' products/products/*grpc.py
 	@rm products/products/*.bak
 
+	python -m grpc_tools.protoc \
+	--proto_path=proto \
+	--python_out=orders/orders \
+	--grpc_python_out=orders/orders \
+	products.proto
+	@# Hack untill I figure how to invoke this piece of code:
+	@# https://github.com/grpc/grpc/pull/10862/files
+	@sed -i.bak 's/^\(import.*_pb2\)/from . \1/' products/products/*grpc.py
+	@rm products/products/*.bak
+
 orders-proto:
 	python -m grpc_tools.protoc \
 	--proto_path=proto \

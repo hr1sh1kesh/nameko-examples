@@ -1,13 +1,16 @@
 import logging
 
 from nameko.events import event_handler
-from nameko.rpc import rpc
-
+from nameko.rpc import rpc,RpcProxy
+from nameko_grpc.entrypoint import Grpc
 from products import dependencies, schemas
-
+from .products_pb2 import GetProduct, Product
+from .products_pb2_grpc import productsStub
+from .products_pb2 import UpdateInventoryResponse, UpdateInventoryResponseDetails
 
 logger = logging.getLogger(__name__)
 
+grpc = Grpc.implementing(productsStub)
 
 class ProductsService:
 
@@ -15,10 +18,11 @@ class ProductsService:
 
     storage = dependencies.Storage()
 
-    @rpc
-    def get(self, product_id):
-        product = self.storage.get(product_id)
-        return schemas.Product().dump(product).data
+    @grpc
+    def get_product(self, request, context):
+        logger.info("recieved grpc request to get products **************** %s", request)
+        product = self.storage.get(request.id)
+        return Product(**product)
 
     @rpc
     def list(self):
@@ -29,6 +33,20 @@ class ProductsService:
     def create(self, product):
         product = schemas.Product(strict=True).load(product).data
         self.storage.create(product)
+
+    @grpc
+    def update_products_inventory(self, request, context):
+        logger.info("recieved grpc request to update products **************** %s", request)
+            
+        response = UpdateInventoryResponse(
+            updateproductinventoryresponse = [
+                UpdateInventoryResponseDetails(
+                    id = "1",
+                    isupdated = True,
+                )
+            ]
+            )
+        return response
 
     @event_handler('orders', 'order_created')
     def handle_order_created(self, payload):

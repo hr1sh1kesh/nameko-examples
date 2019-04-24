@@ -1,6 +1,6 @@
-AMQP_URI: amqp://admin:secretpassword@rabbitmq.examples.svc.cluster.local:5672/
+AMQP_URI: amqp://admin:secretpassword@rabbitmq:5672/
 
-REDIS_URI: redis://user:secretpassword@redis-master.examples.svc.cluster.local:6379/11
+REDIS_URI: redis://user:secretpassword@redis-master:6379/11
 
 GRPC_BIND_PORT: 50051
 

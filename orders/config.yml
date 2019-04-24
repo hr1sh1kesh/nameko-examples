@@ -13,10 +13,10 @@ LOGGING:
             format: "%(asctime)-15s [%(levelname)-4s] [orders] [%(name)-12s] %(message)s"
     handlers:
         default:
-            level: DEBUG
+            level: INFO
             formatter: default
             class: logging.StreamHandler
     root:
-        level: DEBUG
+        level: INFO
         propagate: True
         handlers: [default]

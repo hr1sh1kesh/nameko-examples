@@ -6,6 +6,7 @@ service products {
     rpc get_product(GetProduct) returns (Product);
     rpc create_product(Product) returns (Product);
     rpc list_products(GetProducts) returns (Products);
+    rpc update_products_inventory(UpdateInventoryRequest) returns (UpdateInventoryResponse);
 }
 
 message Product {
@@ -25,3 +26,21 @@ message GetProduct {
 }
 
 message GetProducts {}
+
+message UpdateInventoryRequest {
+    repeated UpdateProductInventoryRequestDetails updateproductinventorydetails = 1;
+}
+
+message UpdateProductInventoryRequestDetails{
+    string id = 1;
+    int32 quantity = 2;
+}
+
+message UpdateInventoryResponse {
+    repeated UpdateInventoryResponseDetails updateproductinventoryresponse = 1;
+}
+
+message UpdateInventoryResponseDetails {
+    string id = 1;
+    bool isupdated = 2;
+}
