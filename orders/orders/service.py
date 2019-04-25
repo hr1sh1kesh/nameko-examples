@@ -5,8 +5,6 @@ from nameko_sqlalchemy import DatabaseSession
 from nameko_grpc.dependency_provider import GrpcProxy
 from nameko_grpc.client import Client
 
-
-
 from orders.exceptions import NotFound
 from orders.models import DeclarativeBase, Order, OrderDetail
 from orders.schemas import OrderSchema
@@ -71,10 +69,9 @@ class OrdersService:
 
     products_grpc = GrpcProxy("http://products.examples.svc.cluster.local:50051", productsStub)
 
-
     @grpc
     def get_order(self, request, context):
-        log.debug("recieved grpc request to get orders **************** %s", request)
+        log.debug("------- Get Order ------- %s", request)
         order = self.db.query(Order).get(request.id)
 
         if not order:
@@ -84,7 +81,6 @@ class OrdersService:
 
     @grpc
     def create_order(self, request, context):
-        log.info(request)
         order = Order(
             order_details=[
                 OrderDetail(
@@ -95,11 +91,11 @@ class OrdersService:
                 for order_detail in request.order_details
             ]
         )
-        log.info("Request received to create an order %s", request.order_details)
+        log.info("------- Create Order with ------- %s", request.order_details)
         self.db.add(order)
         self.db.commit()
 
-        log.info("created order %s", order)
+        log.info("--- Created order --- %s", order)
         
         updateInventoryRequest = UpdateInventoryRequest(
             updateproductinventorydetails=[
@@ -111,24 +107,19 @@ class OrdersService:
             ]
         )
         
-        log.info("Request to update Inventory %s", updateInventoryRequest)
+        log.info("------- Update Inventory of Products after Order creation ------- %s", updateInventoryRequest)
 
-        self.products_grpc.update_products_inventory(UpdateInventoryRequest(
-            updateproductinventorydetails=[
-                UpdateProductInventoryRequestDetails(
-                    id = order_details.product_id,
-                    quantity = order_details.quantity,
-            )
-            for order_details in order.order_details
-            ]))
+        with Client("//products.examples.svc.cluster.local:50051", productsStub) as client:
+            response = client.update_products_inventory(updateInventoryRequest)
+            print(response)
 
-        # with Client("//products.examples.svc.cluster.local", productsStub) as client:
+        # with Client("//products.examples.svc.cluster.local:50051", productsStub) as client:
         #     response = client.get_product(GetProduct(id="5"))
         #     print(response.message)
 
-        self.event_dispatcher('order_created', {
-            'order': order.to_dict(),
-        })
+        # self.event_dispatcher('order_created', {
+        #     'order': order.to_dict(),
+        # })
 
         return self._order_response(order)
 

@@ -20,7 +20,7 @@ class ProductsService:
 
     @grpc
     def get_product(self, request, context):
-        logger.info("recieved grpc request to get products **************** %s", request)
+        logger.info("------- Get Products -------- %s", request)
         product = self.storage.get(request.id)
         return Product(**product)
 
@@ -36,20 +36,24 @@ class ProductsService:
 
     @grpc
     def update_products_inventory(self, request, context):
-        logger.info("recieved grpc request to update products **************** %s", request)
-            
-        response = UpdateInventoryResponse(
-            updateproductinventoryresponse = [
+        logger.info("------- Update Product Inventory ------- %s", request)
+        
+        for productDetails in request.updateproductinventorydetails:
+            logger.info(str(productDetails.id) +" "+ str(productDetails.quantity))
+            self.storage.decrement_stock(productDetails.id, productDetails.quantity)
+            updatedInventory = [
                 UpdateInventoryResponseDetails(
-                    id = "1",
+                    id = str(productDetails.id),
                     isupdated = True,
                 )
-            ]
+            ]            
+        response = UpdateInventoryResponse(
+            updateproductinventoryresponse = updatedInventory
             )
         return response
 
-    @event_handler('orders', 'order_created')
-    def handle_order_created(self, payload):
-        for product in payload['order']['order_details']:
-            self.storage.decrement_stock(
-                product['product_id'], product['quantity'])
+    # @event_handler('orders', 'order_created')
+    # def handle_order_created(self, payload):
+    #     for product in payload['order']['order_details']:
+    #         self.storage.decrement_stock(
+    #             product['product_id'], product['quantity'])
