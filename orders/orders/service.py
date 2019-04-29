@@ -18,49 +18,6 @@ from logging import getLogger
 grpc = Grpc.implementing(ordersStub)
 log = getLogger(__name__)
 
-# class OrdersGrpcService:
-#     name = 'ordersgrpc'
-    
-#     orders_rpc = RpcProxy('orders')
-
-    # @grpc
-    # def get_order(self, request, context):
-    #     log.debug("recieved grpc request to get orders **************** %s", request)
-    #     order = self.orders_rpc.get_order(request.id)
-    #     return self._order_response(order)
-        
-    # @grpc
-    # def create_order(self, request, context):
-    #     log.info(request)
-    #     order = Order(
-    #         order_details=[
-    #             OrderDetail(
-    #                 product_id=order_detail.product_id,
-    #                 price=order_detail.price,
-    #                 quantity=order_detail.quantity,
-    #             )
-    #             for order_detail in request.order_details
-    #         ]
-    #     )
-    #     log.info("request received, order %s", request.order_details)
-    #     order = self.orders_rpc.create_order(order.order_details)
-
-    #     return self._order_response(order)
-
-    # def _order_response(self, order):
-    #     return OrderResponse(
-    #         id=order.id,
-    #         order_details=[
-    #             OrderDetailResponse(
-    #                 id=order_detail.id,
-    #                 product_id=order_detail.product_id,
-    #                 price=str(order_detail.price),
-    #                 quantity=order_detail.quantity,
-    #             )
-    #             for order_detail in order.order_details
-    #         ],
-    #     )
-
 class OrdersService:
     name = 'orders'
 
@@ -112,10 +69,6 @@ class OrdersService:
         with Client("//products.examples.svc.cluster.local:50051", productsStub) as client:
             response = client.update_products_inventory(updateInventoryRequest)
             print(response)
-
-        # with Client("//products.examples.svc.cluster.local:50051", productsStub) as client:
-        #     response = client.get_product(GetProduct(id="5"))
-        #     print(response.message)
 
         # self.event_dispatcher('order_created', {
         #     'order': order.to_dict(),

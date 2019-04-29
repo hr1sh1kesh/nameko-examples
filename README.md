@@ -1,24 +1,16 @@
-# Nameko Examples
-![Airship Ltd](airship.png)
-## Airship Ltd
-Buying and selling quality airships since 2012
-
-[![CircleCI](https://circleci.com/gh/nameko/nameko-examples/tree/master.svg?style=svg)](https://circleci.com/gh/nameko/nameko-examples/tree/master)
+# Nameko grpc Examples
 
 ## Prerequisites
 
 * [Python 3](https://www.python.org/downloads/)
 * [Docker](https://www.docker.com/)
-* [Docker Compose](https://docs.docker.com/compose/)
+* Either [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) or [microk8s] (https://microk8s.io/)
 
 ## Overview
 
 ### Repository structure
-When developing Nameko services you have the freedom to organize your repo structure any way you want.
 
-For this example we placed 3 Nameko services: `Products`, `Orders` and `Gateway` in one repository.
-
-While possible, this is not necessarily the best practice. Aim to apply Domain Driven Design concepts and try to place only services that belong to the same bounded context in one repository e.g., Product (main service responsible for serving products) and Product Indexer (a service responsible for listening for product change events and indexing product data within search database).
+There are 2 Nameko services: `Products` and `Orders` in one repository.
 
 ### Services
 
@@ -36,79 +28,12 @@ This service is using PostgreSQL database to persist order information.
 - [nameko-sqlalchemy](https://pypi.python.org/pypi/nameko-sqlalchemy)  dependency is used to expose [SQLAlchemy](http://www.sqlalchemy.org/) session to the service class.
 - [Alembic](https://pypi.python.org/pypi/alembic) is used for database migrations.
 
-#### Gateway Service
-
-Is a service exposing HTTP Api to be used by external clients e.g., Web and Mobile Apps. It coordinates all incoming requests and composes responses based on data from underlying domain services.
-
-[Marshmallow](https://pypi.python.org/pypi/marshmallow) is used for validating, serializing and deserializing complex Python objects to JSON and vice versa in all services.
-
 ## Running examples
 
-Quickest way to try out examples is to run them with Docker Compose
+Set the following environment variables `CONTEXT`, `NAMESPACE` and `DOCKER_HUB_ORG` before running 
 
-`$ docker-compose up`
+`make build-images push-images deploy-dependencies deploy-services`
 
-Docker images for [RabbitMQ](https://hub.docker.com/_/rabbitmq/), [PostgreSQL](https://hub.docker.com/_/postgres/) and [Redis](https://hub.docker.com/_/redis/) will be automatically downloaded and their containers linked to example service containers.
+This will deploy the required depdencies; Redis, Postgres and RabbitMQ onto the kubernetes cluster via helm charts. 
 
-When you see `Connected to amqp:...` it means services are up and running.
-
-Gateway service with HTTP Api is listening on port 8003 and these endpoitns are available to play with:
-
-#### Create Product
-
-```sh
-$ curl -XPOST -d '{"id": "the_odyssey", "title": "The Odyssey", "passenger_capacity": 101, "maximum_speed": 5, "in_stock": 10}' 'http://localhost:8003/products'
-```
-
-#### Get Product
-
-```sh
-$ curl 'http://localhost:8003/products/the_odyssey'
-
-{
-  "id": "the_odyssey",
-  "title": "The Odyssey",
-  "passenger_capacity": 101,
-  "maximum_speed": 5,
-  "in_stock": 10
-}
-```
-#### Create Order
-
-```sh
-$ curl -XPOST -d '{"order_details": [{"product_id": "the_odyssey", "price": "100000.99", "quantity": 1}]}' 'http://localhost:8003/orders'
-
-{"id": 1}
-```
-
-#### Get Order
-
-```sh
-$ curl 'http://localhost:8003/orders/1'
-
-{
-  "id": 1,
-  "order_details": [
-    {
-      "id": 1,
-      "quantity": 1,
-      "product_id": "the_odyssey",
-      "image": "http://www.example.com/airship/images/the_odyssey.jpg",
-      "price": "100000.99",
-      "product": {
-        "maximum_speed": 5,
-        "id": "the_odyssey",
-        "title": "The Odyssey",
-        "passenger_capacity": 101,
-        "in_stock": 9
-      }
-    }
-  ]
-}
-```
-
-## Running tests
-
-Ensure RabbitMQ, PostgreSQL and Redis are running and `config.yaml` files for each service are configured correctly.
-
-`$ make coverage`
+* > Note: Currently the passwords for rabbit, postgres and redis are hardcoded in the config as well as the helm install commands since this is just an example. 

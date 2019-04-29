@@ -30,10 +30,7 @@ spec:
           - name: "DB_USER"
             value: postgres
           - name: "DB_PASSWORD"
-            valueFrom:
-              secretKeyRef:
-                name: postgresql
-                key: postgresql-password
+            value: secretpassword
           - name: RABBIT_HOST
             value: rabbitmq.examples.svc.cluster.local
           - name: RABBIT_MANAGEMENT_PORT
@@ -43,8 +40,5 @@ spec:
           - name: RABBIT_USER
             value: admin
           - name: RABBIT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: rabbitmq
-                key: rabbitmq-password
+            value: secretpassword
       restartPolicy: Always
